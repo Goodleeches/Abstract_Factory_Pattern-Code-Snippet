@@ -23,7 +23,7 @@ public:
     BaseBlock* createBlock(TileTable playTable, const UserBlockInfo& userBlockInfo, Vec2 vArrIndex);
 
 private:
-    unordered_map<string, BlockFactory*> m_mapBlockFactory;
+    std::unordered_map<int, std::unique_ptr<BlockFactory>> m_mapBlockFactory;
 };
 
 #define g_BLOCK_CREATOR BlockCreator::GetInstance()
@@ -46,91 +46,25 @@ BlockCreator::BlockCreator()
 
 bool BlockCreator::init()
 {
-    m_mapBlockFactory.insert(make_pair("SpawnerBlockFactory", SpawnerBlockFactory::create()));
-    m_mapBlockFactory.insert(make_pair("MaterialBlockFactory", MaterialBlockFactory::create()));
-    m_mapBlockFactory.insert(make_pair("RewardBlockFactory", RewardBlockFactory::create()));
-    m_mapBlockFactory.insert(make_pair("EventBlockFactory", EventBlockFactory::create()));
-    m_mapBlockFactory.insert(make_pair("ItemBlockFactory", ItemBlockFactory::create()));
+    m_mapBlockFactory[1] = std::make_unique<SpawnerBlockFactory>();
+    m_mapBlockFactory[3] = std::make_unique<SpawnerBlockFactory>();
+    m_mapBlockFactory[7] = std::make_unique<SpawnerBlockFactory>();
+    m_mapBlockFactory[2] = std::make_unique<MaterialBlockFactory>();
+    m_mapBlockFactory[8] = std::make_unique<MaterialBlockFactory>();
+    m_mapBlockFactory[4] = std::make_unique<RewardBlockFactory>();
+    m_mapBlockFactory[5] = std::make_unique<EventBlockFactory>();
+    m_mapBlockFactory[6] = std::make_unique<ItemBlockFactory>();
 
     return true;
 }
 
 BaseBlock* BlockCreator::createBlock(TileTable playTable, const UserBlockInfo& userBlockInfo, Vec2 vArrIndex)
 {
-    BlockFactory* pFactory = nullptr;
-
-    switch (userBlockInfo.blockType.mainType)
-    {
-        case 1:
-        case 3:
-        case 7:
-        {
-            auto iter = m_mapBlockFactory.find("SpawnerBlockFactory");
-            if (iter == m_mapBlockFactory.end())
-            {
-                log("Can't Find SpawnerBlockFactory");
-                return nullptr;
-            }
-            pFactory = iter->second;
-        }
-        break;
-
-        case 2:
-        case 8:
-        {
-            auto iter = m_mapBlockFactory.find("MaterialBlockFactory");
-            if (iter == m_mapBlockFactory.end())
-            {
-                log("Can't Find MaterialBlockFactory");
-                return nullptr;
-            }
-            pFactory = iter->second;
-        }
-        break;
-
-        case 4:
-        {
-            auto iter = m_mapBlockFactory.find("RewardBlockFactory");
-            if (iter == m_mapBlockFactory.end())
-            {
-                log("Can't Find RewardBlockFactory");
-                return nullptr;
-            }
-            pFactory = iter->second;
-        }
-        break;
-
-        case 5:
-        {
-            auto iter = m_mapBlockFactory.find("EventBlockFactory");
-            if (iter == m_mapBlockFactory.end())
-            {
-                log("Can't Find EventBlockFactory");
-                return nullptr;
-            }
-            pFactory = iter->second;
-        }
-        break;
-
-        case 6:
-        {
-            auto iter = m_mapBlockFactory.find("ItemBlockFactory");
-            if (iter == m_mapBlockFactory.end())
-            {
-                log("Can't Find ItemBlockFactory");
-                return nullptr;
-            }
-            pFactory = iter->second;
-        }
-        break;
-
-        default:
-            return nullptr;
-    }
-
-    if (pFactory == nullptr)
+    auto iter = m_mapBlockFactory.find(userBlockInfo.blockType.mainType);
+    if (iter == m_mapBlockFactory.end()) {
+        log("Can't find factory for type %d", userBlockInfo.blockType.mainType);
         return nullptr;
-
-    return pFactory->createBlock(playTable, userBlockInfo, vArrIndex);
+    }
+    return iter->second->createBlock(playTable, userBlockInfo, vArrIndex);
 }
 
