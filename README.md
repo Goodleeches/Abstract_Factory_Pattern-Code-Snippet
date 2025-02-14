@@ -27,7 +27,7 @@ private:
 };
 
 #define g_BLOCK_CREATOR BlockCreator::GetInstance()
-
+```
 
 ## **BlockCreator.cpp**
 ```cpp
