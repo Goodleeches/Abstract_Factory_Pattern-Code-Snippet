@@ -1,6 +1,6 @@
 # **Abstract Factory Pattern - C++ Code**
 
-## **🔹 BlockCreator.h**
+## **BlockCreator.h**
 ```cpp
 #pragma once
 #include "../Header/Defines.h"
@@ -27,8 +27,9 @@ private:
 };
 
 #define g_BLOCK_CREATOR BlockCreator::GetInstance()
-'''
-## **🔹 BlockCreator.cpp**
+
+
+## **BlockCreator.cpp**
 ```cpp
 #include "BlockCreator.h"
 #include "SpawnerBlockFactory.h"
@@ -60,80 +61,65 @@ BaseBlock* BlockCreator::createBlock(TileTable playTable, const UserBlockInfo& u
 
     switch (userBlockInfo.blockType.mainType)
     {
-        // Spawner Blocks
         case 1:
         case 3:
         case 7:
         {
             auto iter = m_mapBlockFactory.find("SpawnerBlockFactory");
-
             if (iter == m_mapBlockFactory.end())
             {
                 log("Can't Find SpawnerBlockFactory");
                 return nullptr;
             }
-
             pFactory = iter->second;
         }
         break;
 
-        // Material Blocks
         case 2:
         case 8:
         {
             auto iter = m_mapBlockFactory.find("MaterialBlockFactory");
-
             if (iter == m_mapBlockFactory.end())
             {
                 log("Can't Find MaterialBlockFactory");
                 return nullptr;
             }
-
             pFactory = iter->second;
         }
         break;
 
-        // Reward Blocks
         case 4:
         {
             auto iter = m_mapBlockFactory.find("RewardBlockFactory");
-
             if (iter == m_mapBlockFactory.end())
             {
                 log("Can't Find RewardBlockFactory");
                 return nullptr;
             }
-
             pFactory = iter->second;
         }
         break;
 
-        // Event Blocks
         case 5:
         {
             auto iter = m_mapBlockFactory.find("EventBlockFactory");
-
             if (iter == m_mapBlockFactory.end())
             {
                 log("Can't Find EventBlockFactory");
                 return nullptr;
             }
-
             pFactory = iter->second;
         }
         break;
 
-        // Item Blocks
         case 6:
         {
             auto iter = m_mapBlockFactory.find("ItemBlockFactory");
-
             if (iter == m_mapBlockFactory.end())
             {
                 log("Can't Find ItemBlockFactory");
                 return nullptr;
             }
-
             pFactory = iter->second;
         }
         break;
@@ -147,3 +133,4 @@ BaseBlock* BlockCreator::createBlock(TileTable playTable, const UserBlockInfo& u
 
     return pFactory->createBlock(playTable, userBlockInfo, vArrIndex);
 }
+
